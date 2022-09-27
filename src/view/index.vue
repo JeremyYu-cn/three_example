@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Scene, WebGLRenderer, PerspectiveCamera, BoxGeometry, MeshBasicMaterial, Mesh, LineBasicMaterial, Vector3, Line, BufferGeometry } from 'three'
+import { Scene, WebGLRenderer, PerspectiveCamera, BoxGeometry, MeshBasicMaterial, Mesh, LineBasicMaterial, Vector3, Line, BufferGeometry, AmbientLight } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { makeBackground } from '@/methods/makeBg'
 import { onMounted } from 'vue'
 
 function createLine() {
@@ -46,34 +47,40 @@ onMounted(() => {
   const scene = new Scene()
   const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
   const render = new WebGLRenderer()
+  const light = new AmbientLight(0x444444)
   render.setSize(window.innerWidth, window.innerHeight)
   document.querySelector("#area_page")?.appendChild(render.domElement)
   
   const geometry = new BoxGeometry(500, 500, 0.1)
   const material = new MeshBasicMaterial({ color: "#f5f5f5" })
   const floor = new Mesh(geometry, material)
-  const buildings = createCube(10, 10, window.innerWidth, window.innerHeight)
-  console.log(buildings);
-  
-  buildings.forEach(val => {
-    scene.add(val)
-  })
-  scene.add(floor)
-  camera.position.z = 50;
-  camera.position.x = 0;
 
-  floor.rotation.x = 4.1
+  const buildingGeometry = new BoxGeometry(50, 50, 200)
+  const buildingMaterial = new MeshBasicMaterial({color: '#a1a1a1'})
+  const building = new Mesh(buildingGeometry, buildingMaterial);
+  building.position.set(225, 225, 100)
+  // const buildings = createCube(10, 10, window.innerWidth, window.innerHeight)
+  // console.log(buildings);
+  
+  // buildings.forEach(val => {
+  //   scene.add(val)
+  // })
+  // scene.add(building)
+  // scene.add(floor)
+  // scene.add(light)
+
+  scene.background = makeBackground(["posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg","posz.jpg","negz.jpg"])
 
   const controls = new OrbitControls(camera, render.domElement)
   controls.enableRotate = true
-  camera.position.set(-300, 600, 200)
+  camera.position.set(0, -600, 200)
   controls.update()
-  // function animation() {
-  //   requestAnimationFrame(animation)
-  //   render.render(scene, camera);
-  // }
+  function animation() {
+    requestAnimationFrame(animation)
+    render.render(scene, camera);
+  }
 
-  // animation()
+  animation()
   
   render.render(scene, camera)
 })
